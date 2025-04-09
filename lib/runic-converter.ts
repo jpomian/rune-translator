@@ -1,68 +1,77 @@
+interface RunePath {
+  d: string
+  transform?: string
+}
+
 interface RunicSymbol {
   value: number
-  paths: string[]
+  paths: RunePath[]
+  placeValue: "unit" | "ten" | "hundred" | "thousand"
 }
 
-const runicSymbols: RunicSymbol[] = [
-  // Units (1-9)
-  { value: 1, paths: ["M10,10 L10,90", "M10,10 L30,10"] },
-  { value: 2, paths: ["M10,10 L10,90", "M10,30 L30,30"] },
-  { value: 3, paths: ["M10,10 L10,90", "M10,10 L30,40"] },
-  { value: 4, paths: ["M10,10 L10,90", "M10,40 L30,10"] },
-  { value: 5, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L10,30"] },
-  { value: 6, paths: ["M10,10 L10,90", "M25,10 L25,30"] },
-  { value: 7, paths: ["M10,10 L10,90", "M10,10 L30,10", "M10,10 L30,10", "M30,10 L30,30"] },
-  { value: 8, paths: ["M10,10 L10,90", "M10,30 L30,30", "M30,10 L30,30"] },
-  { value: 9, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,30", "M30,30 L10,30"] },
-
-  // Tens (10-90)
-  { value: 10, paths: ["M10,10 L10,90", "M10,90 L30,90"] },
-  { value: 20, paths: ["M10,10 L10,90", "M10,90 L30,90", "M10,10 L30,10"] },
-  { value: 30, paths: ["M10,10 L10,90", "M10,40 L30,90"] },
-  { value: 40, paths: ["M10,10 L10,90", "M10,90 L30,40"] },
-  { value: 50, paths: ["M10,10 L10,90", "M10,90 L30,90", "M30,90 L30,40"] },
-  { value: 60, paths: ["M10,10 L10,90", "M20,40 L20,90"] },
-  { value: 70, paths: ["M10,10 L10,90", "M10,40 L30,90", "M30,90 L30,40"] },
-  { value: 80, paths: ["M10,10 L10,90", "M10,40 L30,40", "M30,40 L30,90"] },
-  { value: 90, paths: ["M10,10 L10,90", "M10,90 L30,90", "M30,90 L30,10", "M30,10 L10,10"] },
-
-  // Hundreds (100-900)
-  { value: 100, paths: ["M10,10 L10,90", "M10,90 L30,90", "M30,90 L30,10"] },
-  { value: 200, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,90", "M30,90 L10,90"] },
-  { value: 300, paths: ["M10,10 L10,90", "M10,90 L30,40"] },
-  { value: 400, paths: ["M10,10 L10,90", "M10,90 L30,10", "M30,10 L30,90"] },
-  { value: 500, paths: ["M10,10 L10,90", "M10,90 L30,40", "M30,40 L10,40"] },
-  { value: 600, paths: ["M10,10 L10,90", "M10,90 L10,40", "M10,40 L30,40"] },
-  { value: 700, paths: ["M10,10 L10,90", "M10,90 L30,90", "M30,90 L10,40"] },
-  { value: 800, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,40", "M30,40 L10,40"] },
-  { value: 900, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,90", "M30,90 L10,40"] },
-
-  // Thousands (1000-9000)
-  { value: 1000, paths: ["M10,10 L10,90", "M10,90 L30,90", "M30,90 L30,10", "M30,10 L10,10"] },
-  { value: 2000, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,90"] },
-  { value: 3000, paths: ["M10,10 L10,90", "M10,40 L30,10", "M30,10 L30,90"] },
-  { value: 4000, paths: ["M10,10 L10,90", "M10,10 L30,90", "M30,90 L30,10"] },
-  { value: 5000, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L10,40", "M10,40 L30,40"] },
-  { value: 6000, paths: ["M10,10 L10,90", "M10,10 L10,40", "M10,40 L30,40"] },
-  { value: 7000, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L10,90"] },
-  { value: 8000, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,90", "M30,90 L10,40"] },
-  { value: 9000, paths: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,90", "M30,90 L10,90"] },
-]
-
-function isPureValue(num: number): boolean {
-  return (
-    num === 0 ||
-    (num >= 1 && num <= 9) ||
-    (num % 10 === 0 && num >= 10 && num <= 90) ||
-    (num % 100 === 0 && num >= 100 && num <= 900) ||
-    (num % 1000 === 0 && num >= 1000 && num <= 9000)
-  )
+// Base paths for units 1-9
+const unitPaths: Record<number, string[]> = {
+  1: ["M10,10 L10,90", "M10,10 L30,10"],
+  2: ["M10,10 L10,90", "M10,30 L30,30"],
+  3: ["M10,10 L10,90", "M10,10 L30,40"],
+  4: ["M10,10 L10,90", "M10,40 L30,10"],
+  5: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L10,30"],
+  6: ["M10,10 L10,90", "M25,10 L25,30"],
+  7: ["M10,10 L10,90", "M10,10 L30,10", "M10,10 L30,10", "M30,10 L30,30"],
+  8: ["M10,10 L10,90", "M10,30 L30,30", "M30,10 L30,30"],
+  9: ["M10,10 L10,90", "M10,10 L30,10", "M30,10 L30,30", "M30,30 L10,30"],
 }
 
+// Center point for transformations
+const centerX = 20
+const centerY = 50
+
+// Function to create a runic symbol for a specific digit and place value
+function createRunicSymbol(digit: number, placeValue: "unit" | "ten" | "hundred" | "thousand"): RunicSymbol {
+  // Ensure digit is between 1-9
+  if (digit < 1 || digit > 9) {
+    throw new Error(`Invalid digit: ${digit}. Must be between 1 and 9.`)
+  }
+
+  // Get the base paths for this digit
+  const basePaths = unitPaths[digit]
+
+  // Create paths with appropriate transformations based on place value
+  const paths: RunePath[] = basePaths.map((d) => {
+    const path: RunePath = { d }
+
+    switch (placeValue) {
+      case "unit":
+        // No transformation for units
+        break
+      case "ten":
+        // Horizontal flip for tens
+        path.transform = `scale(-1, 1) translate(-${2 * centerX}, 0)`
+        break
+      case "hundred":
+        // Vertical flip for hundreds
+        path.transform = `scale(1, -1) translate(0, -${2 * centerY})`
+        break
+      case "thousand":
+        // Both horizontal and vertical flip for thousands
+        path.transform = `scale(-1, -1) translate(-${2 * centerX}, -${2 * centerY})`
+        break
+    }
+
+    return path
+  })
+
+  return {
+    value: digit * (placeValue === "unit" ? 1 : placeValue === "ten" ? 10 : placeValue === "hundred" ? 100 : 1000),
+    paths,
+    placeValue,
+  }
+}
+
+// Convert a number to its runic representation
 export function convertToRunic(number: number): {
   symbols: RunicSymbol[]
   combined: boolean
-  combinedPaths: string[]
 } {
   // Ensure the number is between 1 and 9999
   const safeNumber = Math.max(1, Math.min(9999, number))
@@ -77,45 +86,43 @@ export function convertToRunic(number: number): {
 
   // Add thousands symbol if needed
   if (thousands > 0) {
-    result.push(runicSymbols.find((s) => s.value === thousands * 1000)!)
+    result.push(createRunicSymbol(thousands, "thousand"))
   }
 
   // Add hundreds symbol if needed
   if (hundreds > 0) {
-    result.push(runicSymbols.find((s) => s.value === hundreds * 100)!)
+    result.push(createRunicSymbol(hundreds, "hundred"))
   }
 
   // Add tens symbol if needed
   if (tens > 0) {
-    result.push(runicSymbols.find((s) => s.value === tens * 10)!)
+    result.push(createRunicSymbol(tens, "ten"))
   }
 
   // Add units symbol if needed
   if (units > 0) {
-    result.push(runicSymbols.find((s) => s.value === units)!)
+    result.push(createRunicSymbol(units, "unit"))
   }
 
-  // Check if we need to combine the symbols
-  const shouldCombine = !isPureValue(safeNumber)
-
-  // If we need to combine, merge all paths into a single symbol
-  let combinedPaths: string[] = []
-  if (shouldCombine) {
-    // Collect all paths from all symbols
-    result.forEach((symbol) => {
-      combinedPaths = [...combinedPaths, ...symbol.paths]
-    })
-  }
+  // Check if we need to combine the symbols (if there's more than one place value)
+  const shouldCombine = result.length > 1
 
   return {
     symbols: result,
     combined: shouldCombine,
-    combinedPaths,
   }
 }
 
-// Function to check if a number is a compound number (examples from the image)
-export function isCompoundExample(num: number): boolean {
-  const examples = [1992, 4723, 6859, 7052, 2971, 9433, 9938]
-  return examples.includes(num)
+// Function to get a description of the place value
+export function getPlaceValueDescription(placeValue: "unit" | "ten" | "hundred" | "thousand"): string {
+  switch (placeValue) {
+    case "unit":
+      return "unit (original)"
+    case "ten":
+      return "ten (horizontally flipped)"
+    case "hundred":
+      return "hundred (vertically flipped)"
+    case "thousand":
+      return "thousand (horizontally and vertically flipped)"
+  }
 }

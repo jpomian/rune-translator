@@ -60,7 +60,13 @@ export default function Home() {
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                <p>The runic system uses different symbols for ones, tens, hundreds, and thousands.</p>
+                <p>The runic system uses transformations of the base symbols:</p>
+                <ul className="list-disc pl-5 mt-1 space-y-1">
+                  <li>Units (1-9): Original symbols</li>
+                  <li>Tens (10-90): Horizontally flipped</li>
+                  <li>Hundreds (100-900): Vertically flipped</li>
+                  <li>Thousands (1000-9000): Both horizontally and vertically flipped</li>
+                </ul>
                 <p className="mt-1">Mixed numbers (like 123) will be displayed as combined runes.</p>
               </AlertDescription>
             </Alert>

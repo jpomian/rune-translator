@@ -16,7 +16,7 @@ export default function RunicSvg({ number }: RunicSvgProps) {
     const numValue = Number.parseInt(number, 10)
     if (isNaN(numValue) || numValue < 1 || numValue > 9999) return
 
-    const { symbols, combined, combinedPaths } = convertToRunic(numValue)
+    const { symbols, combined } = convertToRunic(numValue)
 
     // Clear existing content
     while (svgRef.current.firstChild) {
@@ -27,14 +27,19 @@ export default function RunicSvg({ number }: RunicSvgProps) {
       // Create a single combined symbol
       const g = document.createElementNS("http://www.w3.org/2000/svg", "g")
 
-      // Add paths from the combined symbol
-      combinedPaths.forEach((path) => {
-        const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path")
-        pathElement.setAttribute("d", path)
-        pathElement.setAttribute("stroke", "black")
-        pathElement.setAttribute("stroke-width", "2")
-        pathElement.setAttribute("fill", "none")
-        g.appendChild(pathElement)
+      // Add paths from all symbols
+      symbols.forEach((symbol) => {
+        symbol.paths.forEach((path) => {
+          const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path")
+          pathElement.setAttribute("d", path.d)
+          if (path.transform) {
+            pathElement.setAttribute("transform", path.transform)
+          }
+          pathElement.setAttribute("stroke", "black")
+          pathElement.setAttribute("stroke-width", "2")
+          pathElement.setAttribute("fill", "none")
+          g.appendChild(pathElement)
+        })
       })
 
       svgRef.current?.appendChild(g)
@@ -47,7 +52,10 @@ export default function RunicSvg({ number }: RunicSvgProps) {
         // Add paths from the symbol
         symbol.paths.forEach((path) => {
           const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path")
-          pathElement.setAttribute("d", path)
+          pathElement.setAttribute("d", path.d)
+          if (path.transform) {
+            pathElement.setAttribute("transform", path.transform)
+          }
           pathElement.setAttribute("stroke", "black")
           pathElement.setAttribute("stroke-width", "2")
           pathElement.setAttribute("fill", "none")
@@ -61,7 +69,7 @@ export default function RunicSvg({ number }: RunicSvgProps) {
 
   // Calculate width based on combined or separate symbols
   const numValue = Number.parseInt(number, 10)
-  const { combined, symbols } = convertToRunic(numValue)
+  const { symbols, combined } = convertToRunic(numValue)
   const svgWidth = combined ? 40 : symbols.length * 50
 
   return <svg id="runic-svg" ref={svgRef} width={svgWidth} height="100" viewBox={`0 0 ${svgWidth} 100`} />

@@ -6,13 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from "next/link"
 import { ArrowLeft, Download } from "lucide-react"
 import RunicSvg from "@/components/runic-svg"
-import { convertToRunic, isCompoundExample } from "@/lib/runic-converter"
+import { convertToRunic, getPlaceValueDescription } from "@/lib/runic-converter"
 
 export default function ResultPage() {
   const searchParams = useSearchParams()
   const number = searchParams.get("number") || "0"
   const numValue = Number.parseInt(number, 10)
-  const { combined } = convertToRunic(numValue)
+  const { symbols, combined } = convertToRunic(numValue)
 
   const downloadSvg = () => {
     const svgElement = document.getElementById("runic-svg")
@@ -31,6 +31,7 @@ export default function ResultPage() {
     URL.revokeObjectURL(svgUrl)
   }
 
+  // Function to explain the runic representation
   const explainRunic = () => {
     if (isNaN(numValue) || numValue < 1 || numValue > 9999) {
       return "Invalid number"
@@ -47,11 +48,7 @@ export default function ResultPage() {
     if (tens > 0) parts.push(`${tens}0`)
     if (units > 0) parts.push(`${units}`)
 
-    if (combined) {
-      return `Combined rune for ${parts.join(" + ")}`
-    } else {
-      return `Composed of: ${parts.join(" + ")}`
-    }
+    return `Composed of: ${parts.join(" + ")}`
   }
 
   return (
@@ -66,16 +63,23 @@ export default function ResultPage() {
             <RunicSvg number={number} />
           </div>
           <p className="text-sm text-muted-foreground">{explainRunic()}</p>
+
           {combined && (
             <p className="text-sm text-muted-foreground">
               For mixed numbers like {number}, the runes are combined into a single symbol.
             </p>
           )}
-          {isCompoundExample(numValue) && (
-            <p className="text-sm text-muted-foreground font-semibold">
-              This is one of the example compound numbers shown in the reference chart.
-            </p>
-          )}
+
+          <div className="text-sm text-muted-foreground">
+            <p className="font-medium">Symbols used:</p>
+            <ul className="list-disc pl-5 mt-1 space-y-1">
+              {symbols.map((symbol, index) => (
+                <li key={index}>
+                  {symbol.value}: {getPlaceValueDescription(symbol.placeValue)}
+                </li>
+              ))}
+            </ul>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" asChild>
@@ -84,9 +88,9 @@ export default function ResultPage() {
               Back
             </Link>
           </Button>
-          <Button className="bg-sky-300 hover:bg-sky-200 hover:cursor-grab" onClick={downloadSvg}>
+          <Button onClick={downloadSvg}>
             <Download className="mr-2 h-4 w-4" />
-            Download rune as SVG
+            Download SVG
           </Button>
         </CardFooter>
       </Card>
