@@ -7,8 +7,11 @@ import Link from "next/link"
 import { ArrowLeft, Download } from "lucide-react"
 import RunicSvg from "@/components/runic-svg"
 import { convertToRunic, getPlaceValueDescription } from "@/lib/runic-converter"
+import { SearchBar } from "@/components/searchbar"
+import { useRouter } from "next/navigation";
 
 export default function ResultPage() {
+  const router = useRouter();
   const searchParams = useSearchParams()
   const number = searchParams.get("number") || "0"
   const numValue = Number.parseInt(number, 10)
@@ -51,6 +54,10 @@ export default function ResultPage() {
     return `Composed of: ${parts.join(" + ")}`
   }
 
+  const handleSearch = (number: number) => {
+    router.push(`/result?number=${number}`);
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-md">
@@ -59,6 +66,10 @@ export default function ResultPage() {
           <CardDescription>Runic representation of the number {number}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+        <SearchBar
+            onSearch={handleSearch}
+            placeholder="Enter a number (1-9999)"
+          />
           <div className="border p-6 rounded-md bg-white flex justify-center">
             <RunicSvg number={number} />
           </div>

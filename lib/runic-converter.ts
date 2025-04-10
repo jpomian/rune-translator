@@ -19,9 +19,9 @@ const SYMBOL_PATHS: Record<number, string[]> = {
   3: ["M10,10 L20,40"],  // Diagonal bottom right
   4: ["M10,30 L20,10"],  // Diagonal top right
   5: ["M10,10 L20,10", "M20,10 L10,30"],  // Flag shape
-  6: ["M15,10 L20,10"],  // Detached line
+  6: ["M25,10 L25,30"],  // Detached line
   7: ["M10,10 L20,10", "M20,10 L20,30"],  // Right then down
-  8: ["M10,30 L20,30", "M10,40 L20,40"],  // Two middle lines
+  8: ["M10,30 L30,30", "M30,10 L30,30"],  // Two middle lines
   9: ["M10,10 L20,10", "M20,10 L20,30", "M20,30 L10,30"]  // Square
 };
 
@@ -51,7 +51,6 @@ function createRunicSymbol(digit: number, placeValue: "unit" | "ten" | "hundred"
         // Both horizontal and vertical flip for thousands
         runePath.transform = `scale(-1, -1) translate(-20, -100)`;
         break;
-      // No transformation for units
     }
 
     paths.push(runePath);
@@ -106,3 +105,4 @@ export function getPlaceValueDescription(placeValue: "unit" | "ten" | "hundred" 
     case "thousand": return "thousand (horizontally and vertically flipped)";
   }
 }
+
