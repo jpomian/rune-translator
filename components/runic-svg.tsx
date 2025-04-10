@@ -8,7 +8,6 @@ interface RunicSvgProps {
 }
 
 // Constants for SVG rendering
-const SYMBOL_WIDTH = 40
 const SYMBOL_SPACING = 60
 
 export default function RunicSvg({ number }: RunicSvgProps) {
